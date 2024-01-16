@@ -6,6 +6,7 @@ SERVICE_NAME="PulseAudio"
 
 function cleanup() {
     kill $(jobs -p) > /dev/null 2>&1
+    wait -n
 }
 
 function start() {

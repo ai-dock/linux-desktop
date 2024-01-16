@@ -2,10 +2,8 @@
 ARG IMAGE_BASE="ghcr.io/ai-dock/base-image:cuda-11.8.0-base-22.04"
 FROM ${IMAGE_BASE}
 
-LABEL org.opencontainers.image.source https://github.com/ai-dock/python
-
+LABEL org.opencontainers.image.source https://github.com/ai-dock/desktop
 LABEL org.opencontainers.image.description "Docker desktop environment"
-
 LABEL maintainer="Rob Ballantyne <rob@dynamedia.uk>"
 
 ENV USER_GROUPS=$USER_GROUPS,pulse-access
@@ -31,17 +29,16 @@ ENV SIZEH 1080
 ENV REFRESH 60
 ENV DPI 96
 ENV CDEPTH 24
+
 ENV VGL_DISPLAY egl
-ENV PASSWD mypasswd
-ENV NOVNC_ENABLE false
+ENV VIDEO_PORT=DFB
+
 ENV WEBRTC_ENCODER x264enc
 ENV WEBRTC_ENABLE_RESIZE false
 
 # Set versions for components that should be manually checked before upgrading, other component versions are automatically determined by fetching the version online
 ARG VIRTUALGL_VERSION=3.1
 ENV VIRTUALGL_VERSION=${VIRTUALGL_VERSION}
-ARG NOVNC_VERSION=1.4.0
-ENV NOVNC_VERSION=${NOVNC_VERSION}
 
 # Install KDE and other GUI packages
 ENV XDG_CURRENT_DESKTOP KDE

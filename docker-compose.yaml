@@ -27,7 +27,8 @@ services:
       
     group_add:
       - video
-    #  - render
+      - render
+      - sgx
     
     volumes:
       # For Rclone mount
@@ -48,11 +49,17 @@ services:
         - ${SERVICEPORTAL_PORT_HOST:-1111}:${SERVICEPORTAL_PORT_HOST:-1111}
         # Gstreamer
         - 8080:8080
+        # VNC
+        - 5900:5900
         # Rclone webserver for interactive configuration
         - ${RCLONE_PORT_HOST:-53682}:${RCLONE_PORT_HOST:-53682}
    
     environment:
         # Don't enclose values in quotes
+        - TURN_HOST=freeturn.net
+        - TURN_PORT=3478
+        - TURN_USERNAME=free
+        - TURN_PASSWORD=free
         - DIRECT_ADDRESS=${DIRECT_ADDRESS:-127.0.0.1}
         - DIRECT_ADDRESS_GET_WAN=${DIRECT_ADDRESS_GET_WAN:-false}
         - WORKSPACE=${WORKSPACE:-/workspace}

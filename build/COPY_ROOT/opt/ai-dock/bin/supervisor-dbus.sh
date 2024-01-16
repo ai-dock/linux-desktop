@@ -1,12 +1,15 @@
 #!/bin/bash
 
+# Defer to init to control dbus.
+
 SERVICE_NAME=dbus
-PIDFILE=/run/dbus/pid
 
 trap cleanup EXIT
 
 function cleanup() {
+    /etc/init.d/dbus stop
     kill $(jobs -p) > /dev/null 2>&1
+    wait -n
 }
 
 # todo improve this
@@ -19,29 +22,10 @@ function start() {
     printf "Starting %s...\n" "$SERVICE_NAME"
     mkdir -p /run/dbus
     chown messagebus.messagebus /run/dbus
+    /etc/init.d/dbus start
     
-    # Ensure it's not running
-    if [[ -e $pidfile ]]; then
-        start-stop-daemon \
-          --stop \
-          --retry 5 \
-          --quiet \
-          --oknodo \
-          --pidfile $PIDFILE \
-          --user messagebus > /dev/null 2>&1
-    fi
-    # Make really sure
-    pkill dbus-daemon > /dev/null 2>&1
-    rm -f $PIDFILE
-    
-    dbus-uuidgen --ensure
-    
-    exec start-stop-daemon \
-        --start  \
-        --pidfile $PIDFILE \
-        --exec /usr/bin/dbus-daemon -- \
-            --system \
-            --nofork
+    sleep infinity
 }
+
 
 start 2>&1

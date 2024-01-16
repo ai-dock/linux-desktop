@@ -44,6 +44,7 @@ function build_common_install_xorg() {
         libdbus-c++-1-0v5 \
         libegl1 \
         libegl1:i386 \
+        libelf-dev \
         libgles2 \
         libgles2:i386 \
         libgl1 \
@@ -118,24 +119,32 @@ function build_common_install_xorg() {
         xserver-xorg-input-wacom \
         xserver-xorg-video-all \
         xserver-xorg-video-qxl \
+        xorg \
         xvfb
 }
 
 function build_common_install_virtualgl() {
     cd /tmp
-    curl -fsSL -O "https://github.com/VirtualGL/virtualgl/releases/download/${VIRTUALGL_VERSION}/virtualgl_${VIRTUALGL_VERSION}_amd64.deb"
-    curl -fsSL -O "https://github.com/VirtualGL/virtualgl/releases/download/${VIRTUALGL_VERSION}/virtualgl32_${VIRTUALGL_VERSION}_amd64.deb"
+    wget "https://github.com/VirtualGL/virtualgl/releases/download/${VIRTUALGL_VERSION}/virtualgl_${VIRTUALGL_VERSION}_amd64.deb"
+    wget "https://github.com/VirtualGL/virtualgl/releases/download/${VIRTUALGL_VERSION}/virtualgl32_${VIRTUALGL_VERSION}_amd64.deb"
     
     $APT_INSTALL \
         /tmp/virtualgl_${VIRTUALGL_VERSION}_amd64.deb \
         /tmp/virtualgl32_${VIRTUALGL_VERSION}_amd64.deb
     
-    #chmod u+s /usr/lib/libvglfaker.so
-    #chmod u+s /usr/lib/libdlfaker.so
-    #chmod u+s /usr/lib32/libvglfaker.so
-    #chmod u+s /usr/lib32/libdlfaker.so
-    #chmod u+s /usr/lib/i386-linux-gnu/libvglfaker.so
-    #chmod u+s /usr/lib/i386-linux-gnu/libdlfaker.so
+    chmod u+s /usr/lib/libvglfaker.so
+    chmod u+s /usr/lib/libdlfaker.so
+    chmod u+s /usr/lib32/libvglfaker.so
+    chmod u+s /usr/lib32/libdlfaker.so
+    chmod u+s /usr/lib/i386-linux-gnu/libvglfaker.so
+    chmod u+s /usr/lib/i386-linux-gnu/libdlfaker.so
+}
+
+function build_common_install_turbovnc() {
+    cd /tmp
+    wget https://github.com/TurboVNC/turbovnc/releases/download/${TURBOVNC_VERSION}/turbovnc_${TURBOVNC_VERSION}_amd64.deb
+    $APT_INSTALL \
+        /tmp/turbovnc_${TURBOVNC_VERSION}_amd64.deb
 }
 
 function build_common_install_kde() {

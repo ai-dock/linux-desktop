@@ -49,8 +49,8 @@ function start() {
     pkill selkies-gstreamer > /dev/null 2>&1 &
     wait
     
-    mkdir -pm755 /dev/input
-    touch /dev/input/{js0,js1,js2,js3}
+    sudo mkdir -pm755 /dev/input
+    sudo touch /dev/input/{js0,js1,js2,js3}
     
     export PWA_APP_NAME="AI-Dock Desktop (selkies)"
     export PWA_APP_SHORT_NAME="desktop"
@@ -65,16 +65,17 @@ function start() {
             /opt/gst-web/sw.js
 
     # Clear the cache registry
-    rm -rf /home/user/.cache/gstreamer-1.0
+    rm -rf ~/.cache/gstreamer-1.0
     
     # Start the selkies-gstreamer WebRTC HTML5 remote desktop application
-    export LISTEN_PORT
-    exec su - $USER_NAME -w LISTEN_PORT -c '\
-        source /opt/gstreamer/gst-env && \
-        export ENABLE_BASIC_AUTH=false && \
-        /usr/local/bin/selkies-gstreamer-resize ${SIZEW}x${SIZEH} && \
-        selkies-gstreamer --addr="127.0.0.1" --port="${LISTEN_PORT}" \
-        '
+   
+    source /opt/gstreamer/gst-env
+    xmode="$(cat /tmp/.X-mode)"
+    if [[ $xmode == "proxy" ]]; then
+        /usr/local/bin/selkies-gstreamer-resize ${SIZEW}x${SIZEH}
+    fi
+
+    ENABLE_BASIC_AUTH=false selkies-gstreamer --addr="127.0.0.1" --port="${LISTEN_PORT}"
 }
 
 start 2>&1
