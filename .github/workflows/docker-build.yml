@@ -8,7 +8,7 @@ on:
 env:
   UBUNTU_VERSION: 22.04
   BUILDX_NO_DEFAULT_ATTESTATIONS: 1
-  LATEST_CUDA: "cuda-11.8.0-base-22.04"
+  LATEST_CUDA: "cuda-11.8.0-runtime-22.04"
   LATEST_ROCM: "rocm-5.6-runtime-22.04"
   LATEST_CPU: "cpu-22.04"
 
@@ -74,6 +74,7 @@ jobs:
           - 11.8.0
           - 12.1.0
           - 12.2.0
+          - 12.3.1
         level:
           - "base"
           - "runtime"
@@ -82,9 +83,13 @@ jobs:
           - "cudnn8-devel"
         exclude:
           - cuda: 12.2.0
-            level: "cudnn8-runtime" # Not yet available
+            level: "cudnn8-runtime" # Not available
           - cuda: 12.2.0
-            level: "cudnn8-devel" # Not yet available
+            level: "cudnn8-devel" # Not available
+          - cuda: 12.3.1
+            level: "cudnn8-runtime" # Not available
+          - cuda: 12.3.1
+            level: "cudnn8-devel" # Not available
     steps:
       -
         name: Free Space

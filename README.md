@@ -4,6 +4,9 @@
 
 Run a hardware accelerated KDE desktop in a container. This image is heavily influenced by [Selkies Project](https://github.com/selkies-project) and combines their GLX and EGL containers to provide an accelerated desktop environment for NVIDIA, AMD and Intel machines.
 
+>[!NOTE] 
+>This container image was designed to work with [vast.ai](https://link.ai-dock.org/template-vast-linux-desktop) and [runpod.io](https://link.ai-dock.org/template-runpod-linux-desktop) but will also work locally or with other GPU cloud services, however support for other services is limited.
+
 ## About Desktop
 
 You may connect to the container through the [Selkies-gstreamer](https://github.com/selkies-project/selkies-gstreamer) WebRTC interface (default port `6100`) or through the [KasmVNC](https://github.com/kasmtech/KasmVNC) client (default port `6200`)
@@ -36,7 +39,7 @@ Tags follow these patterns:
 ##### _CUDA_
 - `:cuda-[x.x.x]{-cudnn[x]}-[base|runtime|devel]-[ubuntu-version]`
 
-- `:latest-cuda` &rarr; `:cuda-12.3.1-runtime-22.04`
+- `:latest-cuda` &rarr; `:cuda-11.8.0-runtime-22.04`
 
 ##### _ROCm_
 - `:rocm-[x.x.x]-[core|runtime|devel]-[ubuntu-version]`
