@@ -11,7 +11,7 @@ Run a hardware accelerated KDE desktop in a container. This image is heavily inf
 
 You may connect to the container through the [Selkies-gstreamer](https://github.com/selkies-project/selkies-gstreamer) WebRTC interface (default port `6100`) or through the [KasmVNC](https://github.com/kasmtech/KasmVNC) client (default port `6200`)
 
-A [turn server](https://github.com/coturn/coturn) is bundled with the image to ensure connectivity is possible in most circumstances.  You should always prefer the WebRTC interface and use the VNC client only if all else fails.
+A [turn server](https://github.com/coturn/coturn) is bundled with the image to ensure connectivity is possible in most circumstances.  You should always prefer the WebRTC interface and use the VNC client only if you are unable to establish a WebRTC connection.
 
 When running with an NVIDIA GPU, the container will attempt to download the relevant graphics driver and start a GLX enabled Xorg session.  For all other systems an Xvfb instance will be launched for VirtualGL rendering.
 
@@ -28,7 +28,7 @@ An incremental build process is used to avoid needing a huge cache - The followi
 
 - [nvidia/cuda](https://github.com/NVIDIA/nvidia-docker) / [ubuntu](https://github.com/docker-library/docs/tree/master/ubuntu) &#8628;
 - [ai-dock/base-image](https://github.com/ai-dock/base-image) &#8628;
-- ai-dock/desktop
+- ai-dock/linux-desktop
 
 #### Version Tags
 
@@ -189,42 +189,8 @@ The URL must point to a plain text file - GitHub Gists/Pastebin (raw) are suitab
 
 If you are running locally you may instead opt to mount a script at `/opt/ai-dock/bin/provisioning.sh`.
 
->[!NOTE]  
->If configured, `sshd`, `caddy`, `cloudflared`, `rclone`, `serviceportal`, `storagemonitor` & `logtail` will be launched before provisioning; Any other processes will launch after.
-
 >[!WARNING]  
 >Only use scripts that you trust and which cannot be changed without your consent.
-
-## Software Management
-
-A small software collection is installed by apt-get to provide basic utility.
-
-All other software is installed into its own environment by `micromamba`, which is a drop-in replacement for conda/mamba. Read more about it [here](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html).
-
-Micromamba environments are particularly useful where several software packages are required but their dependencies conflict. 
-
-### Installed Micromamba Environments
-
-| Environment    | Packages |
-| -------------- | ----------------------------------------- |
-| `base`         | micromamba's base environment |
-
-If you are extending this image or running an interactive session where additional software is required, you should almost certainly create a new environment first. See below for guidance.
-
-### Useful Micromamba Commands
-
-| Command                              | Function |
-| -------------------------------------| --------------------- |
-| `micromamba env list`                | List available environments |
-| `micromamba activate [name]`         | Activate the named environment |
-| `micromamba deactivate`              | Close the active environment |
-| `micromamba run -n [name] [command]` | Run a command in the named environment without activating |
-
-All ai-dock images create micromamba environments using the `--always-softlink` flag which can save disk space where multiple environments are available.
-
-To create an additional micromamba environment, eg for python, you can use the following:
-
-`micromamba --always-softlink create -y -c conda-forge -n [name] python=3.10`
 
 ## Volumes
 

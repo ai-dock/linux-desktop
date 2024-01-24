@@ -5,11 +5,13 @@ services:
     build:
       context: ./build
       args:
-        IMAGE_BASE: ${IMAGE_BASE:-ghcr.io/ai-dock/base-image:cuda-11.8.0-base-22.04}
+        IMAGE_BASE: ${IMAGE_BASE:-ghcr.io/ai-dock/base-image:cuda-11.8.0-runtime-22.04}
       tags:
-        - "ghcr.io/ai-dock/desktop:${IMAGE_TAG:-cuda-11.8.0-base-22.04}"
+        - "ghcr.io/ai-dock/desktop:${IMAGE_TAG:-cuda-11.8.0-runtime-22.04}"
         
-    image: ghcr.io/ai-dock/desktop:${IMAGE_TAG:-cuda-11.8.0-base-22.04}
+    image: ghcr.io/ai-dock/linux-desktop:${IMAGE_TAG:-cuda-11.8.0-base-22.04}
+    
+    shm_size: 2G
     
     ## For Nvidia GPU's - You probably want to uncomment this
     #deploy:

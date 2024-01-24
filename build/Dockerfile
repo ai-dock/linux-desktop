@@ -6,6 +6,10 @@ LABEL org.opencontainers.image.source https://github.com/ai-dock/linux-desktop
 LABEL org.opencontainers.image.description "Docker desktop environment"
 LABEL maintainer="Rob Ballantyne <rob@dynamedia.uk>"
 
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
+
 ENV USER_GROUPS=${USER_GROUPS},input,lpadmin,pulse-access
 ENV DISPLAY :0
 ENV VNC_DISPLAY :1
@@ -53,6 +57,11 @@ ENV QT_IM_MODULE fcitx
 ENV XIM fcitx
 ENV XMODIFIERS "@im=fcitx"
 
+ENV APPIMAGE_EXTRACT_AND_RUN 1
+
+ARG WINE_BRANCH=staging
+ENV WINE_BRANCH=${WINE_BRANCH}
+
 # Copy early so we can use scripts in the build - Changes to these files will invalidate the cache and cause a rebuild.
 COPY ./COPY_ROOT/ /
 
@@ -67,8 +76,6 @@ RUN set -eo pipefail && /opt/ai-dock/bin/build/layer0/init.sh | tee /var/log/bui
 # Copy overrides and new files into a final layer for fast rebuilds. Uncomment below
 COPY ./COPY_ROOT_EXTRA/ /
 RUN set -eo pipefail && /opt/ai-dock/bin/build/layer1/init.sh | tee -a /var/log/build.log
-
-ENV LD_PRELOAD /usr/local/lib/selkies-js-interposer/joystick_interposer.so${LD_PRELOAD:+:${LD_PRELOAD}}
 
 # Keep init.sh as-is and place additional logic in /opt/ai-dock/bin/preflight.sh
 CMD ["init.sh"]

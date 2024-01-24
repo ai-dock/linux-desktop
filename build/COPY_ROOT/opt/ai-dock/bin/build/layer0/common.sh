@@ -3,6 +3,7 @@
 source /opt/ai-dock/etc/environment.sh
 
 build_common_main() {
+    add-apt-repository multiverse
     apt-get update
     build_common_install_xorg
     build_common_install_virtualgl

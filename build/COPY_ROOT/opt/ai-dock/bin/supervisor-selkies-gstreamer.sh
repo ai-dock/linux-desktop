@@ -84,6 +84,8 @@ function start() {
         export TURN_PASSWORD="${COTURN_PASSWORD:-password}"
     fi
     
+    export LD_PRELOAD /usr/local/lib/selkies-js-interposer/joystick_interposer.so${LD_PRELOAD:+:${LD_PRELOAD}}
+    
     selkies-gstreamer \
         --enable_basic_auth=false \
         --addr="127.0.0.1" \
