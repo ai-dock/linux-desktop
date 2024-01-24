@@ -14,14 +14,14 @@ function cleanup() {
 
 # todo improve this
 function start() {
+    source /opt/ai-dock/etc/environment.sh
     if [[ ${SERVERLESS,,} = "true" ]]; then
         printf "Refusing to start $SERVICE_NAME in serverless mode\n"
         exec sleep 10
     fi
     
     printf "Starting %s...\n" "$SERVICE_NAME"
-    mkdir -p /run/dbus
-    chown messagebus.messagebus /run/dbus
+   
     /etc/init.d/dbus start
     
     sleep infinity

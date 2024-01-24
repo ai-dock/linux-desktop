@@ -3,11 +3,14 @@
 source /opt/ai-dock/etc/environment.sh
 
 build_common_main() {
+    apt-get update
     build_common_install_xorg
     build_common_install_virtualgl
     build_common_install_kde
     build_common_install_packages
     build_common_install_selkies
+    build_common_install_kasmvnc
+    build_common_install_coturn
 }
 
 function build_common_install_xorg() {
@@ -41,6 +44,7 @@ function build_common_install_xorg() {
         im-config \
         lame \
         libavcodec-extra \
+        libdatetime-perl \
         libdbus-c++-1-0v5 \
         libegl1 \
         libegl1:i386 \
@@ -76,6 +80,7 @@ function build_common_install_xorg() {
         libxdmcp6:i386 \
         libxv1 \
         libxv1:i386 \
+        libxvmc1 \
         libxtst6 \
         libxtst6:i386 \
         mesa-utils \
@@ -140,18 +145,74 @@ function build_common_install_virtualgl() {
     chmod u+s /usr/lib/i386-linux-gnu/libdlfaker.so
 }
 
-function build_common_install_turbovnc() {
+function build_common_install_kasmvnc() {
     cd /tmp
-    wget https://github.com/TurboVNC/turbovnc/releases/download/${TURBOVNC_VERSION}/turbovnc_${TURBOVNC_VERSION}_amd64.deb
+    wget https://github.com/kasmtech/KasmVNC/releases/download/v${KASMVNC_VERSION}/kasmvncserver_jammy_${KASMVNC_VERSION}_amd64.deb
     $APT_INSTALL \
-        /tmp/turbovnc_${TURBOVNC_VERSION}_amd64.deb
+        /tmp/kasmvncserver_jammy_${KASMVNC_VERSION}_amd64.deb
 }
 
 function build_common_install_kde() {
     # Essentials for KDE to start without issues
     $APT_INSTALL \
         kde-plasma-desktop \
+        adwaita-icon-theme-full \
+        appmenu-gtk3-module \
+        ark \
+        aspell \
+        aspell-en \
+        breeze \
+        breeze-cursor-theme \
+        breeze-gtk-theme \
+        breeze-icon-theme \
+        debconf-kde-helper \
+        desktop-file-utils \
+        dolphin \
+        dolphin-plugins \
+        dbus-x11 \
+        enchant-2 \
+        fcitx \
+        fcitx-frontend-gtk2 \
+        fcitx-frontend-gtk3 \
+        fcitx-frontend-qt5 \
+        fcitx-module-dbus \
+        fcitx-module-kimpanel \
+        fcitx-module-lua \
+        fcitx-module-x11 \
+        fcitx-tools \
+        fcitx-hangul \
+        fcitx-libpinyin \
+        fcitx-m17n \
+        fcitx-mozc \
+        fcitx-sayura \
+        fcitx-unikey \
+        filelight \
         frameworkintegration \
+        gwenview \
+        haveged \
+        hunspell \
+        im-config \
+        kate \
+        kcalc \
+        kcharselect \
+        kdeadmin \
+        kde-config-fcitx \
+        kde-config-gtk-style \
+        kde-config-gtk-style-preview \
+        kdeconnect \
+        kdegraphics-thumbnailers \
+        kde-spectacle \
+        kdf \
+        kdialog \
+        kget \
+        kimageformat-plugins \
+        kinfocenter \
+        kio \
+        kio-extras \
+        kmag \
+        kmenuedit \
+        kmix \
+        kmousetool \
         kmouth \
         ksshaskpass \
         ktimer \
@@ -198,14 +259,37 @@ function build_common_install_kde() {
         qtvirtualkeyboard-plugin \
         software-properties-qt \
         sonnet-plugins \
+        sweeper \
         systemsettings \
+        ubuntu-drivers-common \
         xdg-desktop-portal-kde \
-        xdg-user-dirs
+        xdg-user-dirs \
+        pavucontrol-qt
+    
+    # Fix KDE startup permissions issues in containers
+    #cp -f /usr/lib/x86_64-linux-gnu/libexec/kf5/start_kdeinit /tmp/
+    #rm -f /usr/lib/x86_64-linux-gnu/libexec/kf5/start_kdeinit
+    #cp -r /tmp/start_kdeinit /usr/lib/x86_64-linux-gnu/libexec/kf5/start_kdeinit
+    #rm -f /tmp/start_kdeinit
 }
 
 function build_common_install_packages() {
+    mkdir -pm755 /etc/apt/trusted.gpg.d && curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x0AB215679C571D1C8325275B9BDB3D89CE49EC21" | gpg --dearmor -o /etc/apt/trusted.gpg.d/mozillateam-ubuntu-ppa.gpg && \
+    mkdir -pm755 /etc/apt/sources.list.d && echo "deb https://ppa.launchpadcontent.net/mozillateam/ppa/ubuntu $(grep UBUNTU_CODENAME= /etc/os-release | cut -d= -f2 | tr -d '\"') main" > "/etc/apt/sources.list.d/mozillateam-ubuntu-ppa-$(grep UBUNTU_CODENAME= /etc/os-release | cut -d= -f2 | tr -d '\"').list" && \
+    apt-get update
+
     $APT_INSTALL \
-        vlc
+        firefox \
+        vlc \
+        vlc-l10n \
+        vlc-plugin-access-extra \
+        vlc-plugin-notify \
+        vlc-plugin-samba \
+        vlc-plugin-skins2 \
+        vlc-plugin-video-splitter \
+        vlc-plugin-visualization
+
+        update-alternatives --set x-www-browser /usr/bin/firefox
 }
 
 function build_common_install_selkies() {
@@ -234,7 +318,8 @@ function build_common_install_selkies() {
         i965-va-driver-shaders \
         intel-media-va-driver-non-free \
         intel-gpu-tools \
-        radeontop
+        radeontop \
+        gdebi-core libgdk-pixbuf-xlib-2.0-0 libgdk-pixbuf2.0-0 libsoup-gnome2.4-1 libxdo3 python3-chardet python3-debian xdotool
     
     if [[ -z $SELKIES_VERSION || ${SELKIES_VERSION,,} == 'latest' ]]; then
         SELKIES_VERSION="$(curl -fsSL "https://api.github.com/repos/selkies-project/selkies-gstreamer/releases/latest" \
@@ -254,6 +339,10 @@ function build_common_install_selkies() {
     cd /tmp
     curl -fsSL -o selkies-js-interposer.deb "https://github.com/selkies-project/selkies-gstreamer/releases/download/v${SELKIES_VERSION}/selkies-js-interposer-v${SELKIES_VERSION}-ubuntu$(grep VERSION_ID= /etc/os-release | cut -d= -f2 | tr -d '\"').deb"
     $APT_INSTALL ./selkies-js-interposer.deb
+}
+
+function build_common_install_coturn() {
+    $APT_INSTALL coturn
 }
 
 build_common_main "$@"

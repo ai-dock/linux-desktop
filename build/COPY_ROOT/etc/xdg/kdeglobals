@@ -1,6 +1,5 @@
 [KDE]
 SingleClick=false
-
 [KDE Action Restrictions]
 action/lock_screen=false
 logout=false

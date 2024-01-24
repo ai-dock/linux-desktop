@@ -7,7 +7,7 @@ build_cpu_main() {
       i965-va-driver-shaders:i386 \
       intel-media-va-driver-non-free \
       intel-media-va-driver-non-free:i386 \
-      xserver-xorg-video-intel \
+      xserver-xorg-video-intel
 }
 
 build_cpu_main "$@"

@@ -24,11 +24,6 @@ services:
       - "/dev/dri:/dev/dri"
       # For AMD GPU
       #- "/dev/kfd:/dev/kfd"
-      
-    group_add:
-      - video
-      - render
-      - sgx
     
     volumes:
       # For Rclone mount
@@ -47,19 +42,32 @@ services:
         - ${SSH_PORT_HOST:-2222}:${SSH_PORT_LOCAL:-22}
         # Web UI for easy service access
         - ${SERVICEPORTAL_PORT_HOST:-1111}:${SERVICEPORTAL_PORT_HOST:-1111}
-        # Gstreamer
-        - 8080:8080
+        # Coturn
+        - ${COTURN_PORT_HOST:-3478}:${COTURN_PORT_HOST:-3478}
+        # Selkies
+        - ${WEBRTC_PORT_HOST:-6100}:${WEBRTC_PORT_HOST:-6100}
         # VNC
-        - 5900:5900
+        - ${VNC_PORT_HOST:-6200}:${VNC_PORT_HOST:-6200}
         # Rclone webserver for interactive configuration
         - ${RCLONE_PORT_HOST:-53682}:${RCLONE_PORT_HOST:-53682}
    
     environment:
         # Don't enclose values in quotes
-        - TURN_HOST=freeturn.net
-        - TURN_PORT=3478
-        - TURN_USERNAME=free
-        - TURN_PASSWORD=free
+        - ENABLE_COTURN=${ENABLE_COTURN:-false}
+        # External IP
+        - COTURN_LISTEN_ADDRESS=${COTURN_LISTEN_ADDRESS:-127.0.0.1}
+        - COTURN_PORT_HOST=${COTURN_PORT_HOST:-3478}
+        - COTURN_USER=${COTURN_USER:-user}
+        # Auto-generated when empty
+        - COTURN_PASSWORD=${COTURN_PASSWORD:-}
+        # External IP if coturn
+        - TURN_HOST=${TURN_HOST:-127.0.0.1}
+        - TURN_PORT=${TURN_PORT:-3478}
+        - TURN_PROTOCOL=${TURN_PROTOCOL:-tcp}
+        - TURN_USERNAME=${TURN_USERNAME:-}
+        - TURN_PASSWORD=${TURN_PASSWORD:-}
+        - WEBRTC_ENABLE_RESIZE=${WEBRTC_ENABLE_RESIZE:-false}
+        - WEBRTC_ENCODER=${WEBRTC_ENCODER:-nvh264enc}
         - DIRECT_ADDRESS=${DIRECT_ADDRESS:-127.0.0.1}
         - DIRECT_ADDRESS_GET_WAN=${DIRECT_ADDRESS_GET_WAN:-false}
         - WORKSPACE=${WORKSPACE:-/workspace}
@@ -74,5 +82,15 @@ services:
         - SERVICEPORTAL_PORT_HOST=${SERVICEPORTAL_PORT_HOST:-1111}
         - SERVICEPORTAL_PORT_LOCAL=${SERVICEPORTAL_PORT_LOCAL:-11111}
         - SERVICEPORTAL_METRICS_PORT=${SERVICEPORTAL_METRICS_PORT:-21111}
+        - VNC_PORT_HOST=${VNC_PORT_HOST:-6200}
+        - VNC_PORT_LOCAL=${VNC_PORT_LOCAL:-16200}
+        - VNC_METRICS_PORT=${VNC_METRICS_PORT:-26200}
+        - WEBRTC_PORT_HOST=${WEBRTC_PORT_HOST:-6100}
+        - WEBRTC_PORT_LOCAL=${WEBRTC_PORT_LOCAL:-16100}
+        - WEBRTC_METRICS_PORT=${WEBRTC_METRICS_PORT:-26100}
         - SERVERLESS=${SERVERLESS:-false}
         #- PROVISIONING_SCRIPT=https://raw.githubusercontent.com/ai-dock/python/main/config/provisioning/default.sh
+    
+    # Magic bullet to solve networking issues - I don't like it
+    # Turn server works fine both within local network and for internet
+    #network_mode: "host"

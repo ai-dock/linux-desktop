@@ -7,9 +7,11 @@ SERVICE_NAME="PulseAudio"
 function cleanup() {
     kill $(jobs -p) > /dev/null 2>&1
     wait -n
+    pulseaudio -k
 }
 
 function start() {
+    source /opt/ai-dock/etc/environment.sh
     if [[ ${SERVERLESS,,} = "true" ]]; then
         printf "Refusing to start $SERVICE_NAME in serverless mode\n"
         exec sleep 10
@@ -26,6 +28,7 @@ function start() {
         printf "Waiting for dbus socket...\n"
         sleep 1
     done
+    source /opt/ai-dock/etc/environment.sh
     
     exec pulseaudio \
         --system \

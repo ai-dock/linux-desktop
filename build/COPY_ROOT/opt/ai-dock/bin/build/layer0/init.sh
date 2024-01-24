@@ -16,4 +16,6 @@ else
     exit 1
 fi
 
+fix-permissions.sh -o container
+
 source /opt/ai-dock/bin/build/layer0/clean.sh
