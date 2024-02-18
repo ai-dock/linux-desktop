@@ -79,17 +79,6 @@ jobs:
           - "base"
           - "runtime"
           - "devel"
-          - "cudnn8-runtime"
-          - "cudnn8-devel"
-        exclude:
-          - cuda: 12.2.0
-            level: "cudnn8-runtime" # Not available
-          - cuda: 12.2.0
-            level: "cudnn8-devel" # Not available
-          - cuda: 12.3.1
-            level: "cudnn8-runtime" # Not available
-          - cuda: 12.3.1
-            level: "cudnn8-devel" # Not available
     steps:
       -
         name: Free Space
@@ -143,7 +132,7 @@ jobs:
       fail-fast: false
       matrix:
         rocm:
-          - 5.4.2
+          - 5.7
           - 5.6
         level:
           - "core"
