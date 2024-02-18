@@ -2,6 +2,7 @@
 
 # Must exit and fail to build if any command fails
 set -eo pipefail
+umask 002
 
 source /opt/ai-dock/bin/build/layer0/common.sh
 
@@ -15,7 +16,5 @@ else
     printf "No valid XPU_TARGET specified\n" >&2
     exit 1
 fi
-
-fix-permissions.sh -o container
 
 source /opt/ai-dock/bin/build/layer0/clean.sh

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Override this file to add extras to your build
-
+umask 002
 # Wine, Winetricks, Lutris, and PlayOnLinux, this process must be consistent with https://wiki.winehq.org/Ubuntu
 
 mkdir -pm755 /etc/apt/keyrings
@@ -42,3 +42,4 @@ $APT_INSTALL \
     gimp \
     inkscape
 
+fix-permissions -o container

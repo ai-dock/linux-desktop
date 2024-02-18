@@ -6,11 +6,12 @@ LISTEN_PORT=${SELKIES_PORT_LOCAL:-16100}
 METRICS_PORT=${SELKIES_METRICS_PORT:-26100}
 PROXY_PORT=${SELKIES_PORT_HOST:-6100}
 PROXY_SECURE=true
+QUICKTUNNELS=true
 SERVICE_NAME="KDE Plasma Desktop (WebRTC)"
 
 function cleanup() {
     rm -f /run/http_ports/$PROXY_PORT
-    kill $(lsof -t -i:$LISTEN_PORT) > /dev/null 2>&1 &
+    fuser -k -SIGTERM ${LISTEN_PORT}/tcp > /dev/null 2>&1 &
     wait -n
 }
 
@@ -35,7 +36,7 @@ function start() {
     
     printf "%s\n" "$file_content" > /run/http_ports/$PROXY_PORT
     
-    kill $(lsof -t -i:$LISTEN_PORT) > /dev/null 2>&1 &
+    fuser -k -SIGKILL ${LISTEN_PORT}/tcp > /dev/null 2>&1 &
     wait -n
     printf "Starting ${SERVICE_NAME}...\n"
     

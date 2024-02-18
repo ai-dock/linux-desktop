@@ -6,11 +6,12 @@ LISTEN_PORT=${VNC_PORT_LOCAL:-16200}
 METRICS_PORT=${VNC_METRICS_PORT:-26200}
 PROXY_PORT=${VNC_PORT_HOST:-6200}
 PROXY_SECURE=true
+QUICKTUNNELS=true
 SERVICE_NAME="KDE Plasma Desktop (VNC Fallback)"
 
 function cleanup() {
     rm /run/http_ports/$PROXY_PORT > /dev/null 2>&1
-    kill $(lsof -t -i:$LISTEN_PORT) > /dev/null 2>&1 &
+    fuser -k -SIGTERM ${LISTEN_PORT}/tcp > /dev/null 2>&1 &
     wait -n
 }
 
@@ -34,7 +35,7 @@ function start() {
     
     printf "%s\n" "$file_content" > /run/http_ports/$PROXY_PORT
     
-    kill $(lsof -t -i:$LISTEN_PORT) > /dev/null 2>&1 &
+    fuser -k -SIGKILL ${LISTEN_PORT}/tcp > /dev/null 2>&1 &
     wait -n
     
     printf "Starting ${SERVICE_NAME}...\n"

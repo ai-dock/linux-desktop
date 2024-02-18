@@ -28,9 +28,6 @@ services:
       #- "/dev/kfd:/dev/kfd"
     
     volumes:
-      # For Rclone mount
-      #- /etc/passwd:/etc/passwd:ro
-      #- /etc/group:/etc/group:ro
       - ./config/rclone:/etc/rclone
       # Workspace
       - ./workspace:${WORKSPACE:-/workspace}:rshared
@@ -82,13 +79,10 @@ services:
         - SSH_PORT_HOST=${SSH_PORT_HOST:-2222}
         - SSH_PORT_LOCAL=${SSH_PORT_LOCAL:-22}
         - SERVICEPORTAL_PORT_HOST=${SERVICEPORTAL_PORT_HOST:-1111}
-        - SERVICEPORTAL_PORT_LOCAL=${SERVICEPORTAL_PORT_LOCAL:-11111}
         - SERVICEPORTAL_METRICS_PORT=${SERVICEPORTAL_METRICS_PORT:-21111}
         - VNC_PORT_HOST=${VNC_PORT_HOST:-6200}
-        - VNC_PORT_LOCAL=${VNC_PORT_LOCAL:-16200}
         - VNC_METRICS_PORT=${VNC_METRICS_PORT:-26200}
         - WEBRTC_PORT_HOST=${WEBRTC_PORT_HOST:-6100}
-        - WEBRTC_PORT_LOCAL=${WEBRTC_PORT_LOCAL:-16100}
         - WEBRTC_METRICS_PORT=${WEBRTC_METRICS_PORT:-26100}
         - SERVERLESS=${SERVERLESS:-false}
         #- PROVISIONING_SCRIPT=https://raw.githubusercontent.com/ai-dock/python/main/config/provisioning/default.sh

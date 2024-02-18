@@ -7,7 +7,7 @@ LISTEN_PORT="${COTURN_PORT_HOST:-3478}"
 COTURN_LISTEN_ADDRESS=${COTURN_LISTEN_ADDRESS:-${EXTERNAL_IP_ADDRESS}}
 
 function cleanup() {
-    kill $(lsof -t -i:$LISTEN_PORT) > /dev/null 2>&1 &
+    fuser -k -SIGTERM ${LISTEN_PORT}/tcp > /dev/null 2>&1 &
     wait -n
 }
 
@@ -24,6 +24,7 @@ function start() {
         exec sleep 10
     fi
     
+    fuser -k -SIGKILL ${LISTEN_PORT}/tcp > /dev/null 2>&1 &
     printf "Starting ${SERVICE_NAME}...\n"
     turnserver \
         -n \
