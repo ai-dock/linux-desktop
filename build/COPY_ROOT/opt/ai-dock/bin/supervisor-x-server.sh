@@ -13,6 +13,8 @@ function cleanup() {
 }
 
 function start() {
+    source /opt/ai-dock/etc/environment.sh
+    
     if [[ ${SERVERLESS,,} = "true" ]]; then
         printf "Refusing to start $SERVICE_NAME in serverless mode\n"
         exec sleep 10
@@ -29,7 +31,7 @@ function start() {
     # This symbolic link enables running Xorg inside a container with `-sharevts`
     sudo ln -snf /dev/ptmx /dev/tty7
     sudo mkdir -pm700 /tmp/runtime-user
-    sudo chown ${USER_NAME}:${USER_NAME} /tmp/runtime-user
+    sudo chown $(id -u):$(id -u) /tmp/runtime-user
     
     if [[ $XPU_TARGET == "NVIDIA_GPU"  && $(is_nvidia_capable) == "true" ]]; then
         printf "Starting NVIDIA X server...\n"

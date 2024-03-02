@@ -1,0 +1,3 @@
+#!/bin/bash
+
+exec /opt/krita/squashfs-root/AppRun "$@"

@@ -1,0 +1,13 @@
+"compatibilitytools"
+{
+  "compat_tools"
+  {
+    "PROTON_NAME"
+    {
+      "install_path" "."
+      "display_name" "PROTON_NAME (No SLR)"
+      "from_oslist"  "windows"
+      "to_oslist"    "linux"
+    }
+  }
+}

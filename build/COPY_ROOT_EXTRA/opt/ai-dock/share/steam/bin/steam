@@ -1,0 +1,118 @@
+#!/bin/sh -e
+# Copyright (C) 2013-2018 Michael Gilbert <mgilbert@debian.org>
+# Copyright (C) 2018-2020 Simon McVittie
+# Copyright (C) 2020 Collabora Ltd.
+# License: MIT
+
+# Used by diagnostic tools to identify the launcher
+export STEAMSCRIPT="$0"
+# Edited by debian/rules to fill in the real version number
+export STEAMSCRIPT_VERSION='1.0.0.74-1ubuntu2/Ubuntu'
+
+# According to Valve, ~/.steam is intended to be a control directory containing
+# symbolic links pointing to the currently-running or most-recently-run Steam
+# installation. This is part of Steam's API, and is relied on by external
+# components.
+#
+# The shell variable name STEAMCONFIG matches what's used in Valve's
+# /usr/bin/steam (available at $STEAMDIR/bin_steam.sh in a Steam
+# installation).
+STEAMCONFIG="$HOME/.steam"
+
+: "${XDG_DATA_HOME:="$HOME/.local/share"}"
+
+# Fix dangling symlinks
+if [ -L "$STEAMCONFIG/steam" ] && ! [ -e "$STEAMCONFIG/steam" ]; then
+    rm -f "$STEAMCONFIG/steam"
+fi
+if [ -L "$STEAMCONFIG/root" ] && ! [ -e "$STEAMCONFIG/root" ]; then
+    rm -f "$STEAMCONFIG/root"
+fi
+
+# STEAMDIR points to the actual installation root: the equivalent of
+# C:\Program Files\Steam in the Windows Steam client. To avoid filename
+# collisions this should be distinct from ~/.steam.
+#
+# The shell variable name STEAMDIR matches what's used in Valve's
+# /usr/bin/steam (bin_steam.sh).
+#
+# Strictly speaking, there can be two separate Steam directories:
+# ~/.steam/steam is a symlink to the Steam data directory (containing
+# e.g. games), while ~/.steam/root is a symlink to the Steam installation
+# (containing the Steam executable and the Steam Runtime). This is used
+# when testing new Steam client binaries, and older versions of this Debian
+# package set up a similar situation by mistake.
+if [ -L "$STEAMCONFIG/steam" ]; then
+    STEAMDIR="$(readlink -e -q "$STEAMCONFIG/steam")"
+elif [ -L "$STEAMCONFIG/root" ]; then
+    STEAMDIR="$(readlink -e -q "$STEAMCONFIG/root")"
+elif [ -d "$STEAMCONFIG/steam" ] && ! [ -L "$STEAMCONFIG/steam" ]; then
+    # The historical Debian behaviour has been to use ~/.steam as the
+    # installation directory in addition to using it as the control
+    # directory.This causes some file collisions, so we've moved away
+    # from that, but we can't easily disentangle this in existing
+    # installations.
+    STEAMDIR="$HOME/.steam"
+else
+    # This is a new installation, so use a distinct directory to avoid
+    # file collisions. Valve would use $XDG_DATA_HOME/Steam here.
+    # Debian uses a subdirectory of ~/.steam, to avoid having a mixture
+    # of XDG basedirs and traditional dotfiles in the same application.
+    STEAMDIR="$HOME/.steam/debian-installation"
+fi
+
+ubuntu32="$STEAMDIR/ubuntu12_32"
+steam="$ubuntu32/steam"
+runtime="$ubuntu32/steam-runtime"
+
+real=/usr/lib/games/steam/steam
+
+# use C locale (bug #764311)
+test -n "$LANG" || export LANG=C
+
+# check wether this system supports sse2
+nosse2="\
+WARNING:
+The hardware on this system lacks support for the sse2 instruction set.
+The browser within the steam client will not work. For more information,
+see: https://support.steampowered.com/kb_article.php?ref=4090-RTKZ-4347"
+if ! grep -q sse2 /proc/cpuinfo; then
+    echo "$nosse2"
+fi
+
+# do an initial update when expected pieces are missing
+test ! -d "$STEAMCONFIG" && rm -rf "$STEAMCONFIG" && mkdir -p "$STEAMCONFIG" || true
+test ! -d "$STEAMDIR" && rm -rf "$STEAMDIR" && mkdir -p "$STEAMDIR" || true
+
+# Recent versions of the proprietary steam executable exit with an
+# assertion failure if these links aren't already set up.
+if ! [ -d "$STEAMCONFIG/steam" ]; then
+    ln -fns "$STEAMDIR" "$STEAMCONFIG/steam"
+fi
+if ! [ -d "$STEAMCONFIG/root" ]; then
+    ln -fns "$STEAMDIR" "$STEAMCONFIG/root"
+fi
+
+test ! -x "$STEAMDIR/steam.sh" && rm -rf "$STEAMDIR/package" "$steam" || true
+test ! -d "$ubuntu32" && rm -rf "$ubuntu32" && mkdir -p "$ubuntu32" || true
+test ! -x "$steam" && rm -rf "$steam" && cp "$real" "$steam" && "$steam" || true
+test ! -e "$runtime.tar.xz" && cat "$runtime.tar.xz.part"* > "$runtime.tar.xz" || true
+test ! -d "$runtime" && cd "$ubuntu32" && tar xf steam-runtime.tar.xz && \
+    md5sum steam-runtime.tar.xz > steam-runtime/checksum || \
+    rm -f steam-runtime.tar.xz*
+
+## AI-Dock edit
+if [ -n "$STEAM_ARCHIVE_ID" ] && [ ! -f  "$STEAMDIR/.downgrade_complete" ]; then
+    kdialog --passivepopup "Downgrading steam client to latest working version" 10 --title "Steam Installer" &
+    printf "BootStrapperInhibitAll=enable\nBootStrapperForceSelfUpdate=disable" > "$STEAMDIR/Steam.cfg"
+	"$STEAMDIR/steam.sh" -forcesteamupdate -forcepackagedownload -overridepackageurl "https://web.archive.org/web/${STEAM_ARCHIVE_ID}if_/media.steampowered.com/client" -exitsteam && \
+        touch "$STEAMDIR/.downgrade_complete"
+fi
+
+# Remove old log file to avoid confusion. To debug game/Steam issues,
+# please run this script from an interactive terminal, run it with its
+# stdout/stderr redirected, or wrap it with script(1).
+rm -f "$STEAMDIR/error.log"
+
+# launch the Valve run script
+test -x "$STEAMDIR/steam.sh" && exec "$STEAMDIR/steam.sh" -nominidumps -nobreakpad -noverifyfiles -nobootstrapupdate -skipinitialbootstrap -norepairfiles "$@"
