@@ -1,8 +1,8 @@
 #!/bin/bash
 set -eo pipefail
-# Override this file to add extras to your build
 umask 002
-# Wine, Winetricks, Lutris, and PlayOnLinux, this process must be consistent with https://wiki.winehq.org/Ubuntu
+# Override this file to add extras to your build
+# Wine, Winetricks, Lutris, this process must be consistent with https://wiki.winehq.org/Ubuntu
 
 mkdir -pm755 /etc/apt/keyrings
 curl -fsSL -o /etc/apt/keyrings/winehq-archive.key "https://dl.winehq.org/wine-builds/winehq.key"
@@ -10,9 +10,7 @@ curl -fsSL -o "/etc/apt/sources.list.d/winehq-$(grep UBUNTU_CODENAME= /etc/os-re
 apt-get update
 apt-get install --install-recommends -y \
         winehq-${WINE_BRANCH}
-apt-get install --no-install-recommends -y \
-        q4wine \
-        playonlinux
+
 export LUTRIS_VERSION="$(curl -fsSL "https://api.github.com/repos/lutris/lutris/releases/latest" | jq -r '.tag_name' | sed 's/[^0-9\.\-]*//g')"
 env-store LUTRIS_VERSION
 curl -fsSL -O "https://github.com/lutris/lutris/releases/download/v${LUTRIS_VERSION}/lutris_${LUTRIS_VERSION}_all.deb"
@@ -34,6 +32,9 @@ export GE_PROTON_VERSION="$(curl -fsSL "https://api.github.com/repos/GloriousEgg
 env-store GE_PROTON_VERSION
 mkdir -p /opt/proton
 wget -c "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/${GE_PROTON_VERSION}/${GE_PROTON_VERSION}.tar.gz" -O - | tar xz -C /opt/proton
+proton_dir="/opt/proton/${GE_PROTON_VERSION}"
+cp /opt/ai-dock/share/proton/*.vdf "${proton_dir}"
+sed -i "s#PROTON_NAME#${GE_PROTON_VERSION}#g" "${proton_dir}/compatibilitytool.vdf"
 
 dpkg-divert --add /usr/games/steam
 $APT_INSTALL \
@@ -69,7 +70,6 @@ $APT_INSTALL /tmp/chrome.deb
 dpkg-divert --add /opt/google/chrome/google-chrome
 cp -f /opt/google/chrome/google-chrome /opt/google/chrome/google-chrome.distrib
 cp -f /opt/ai-dock/share/google-chrome/bin/google-chrome /opt/google/chrome/google-chrome
-
 
 rm -rf /tmp/*
 

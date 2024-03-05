@@ -1,5 +1,5 @@
 "manifest"
 {
   "version" "2"
-  "commandline" "'PROTON_BINARY_PATH' %verb%"
+  "commandline" "/proton %verb%"
 }
