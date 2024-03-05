@@ -138,6 +138,77 @@ jobs:
           provenance: false
           tags: ${{ env.TAGS }}
 
+  nvidia-base-pytorch:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        cuda:
+          - 11.8.0
+          - 12.1.0
+        level:
+          - "runtime"
+          - "devel"
+        python:
+          - "3.10"
+          - "3.11"
+          - "3.12"
+        pytorch:
+          - "2.1.2"
+          - "2.2.0"
+    steps:
+      -
+        name: Free Space
+        run: |
+          df -h
+          rm -rf /usr/share/dotnet
+          rm -rf /opt/ghc
+          rm -rf /usr/local/share/boost
+          rm -rf "$AGENT_TOOLSDIRECTORY"
+          df -h
+      -
+        name: Env Setter
+        run: |
+          echo "PACKAGE_NAME=${GITHUB_REPOSITORY,,}" >> ${GITHUB_ENV}
+      -
+        name: Checkout
+        uses: actions/checkout@v3
+      -
+        name: Permissions fixes
+        run: |
+          reponame="$(basename ${GITHUB_REPOSITORY})"
+          target="${HOME}/work/${reponame}/${reponame}/build/COPY*"
+          chmod -R ug+rwX ${target}
+      -
+        name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: Set tags
+        run: |
+          img_path="ghcr.io/${{ env.PACKAGE_NAME }}"
+          ver_tag="jupyter-pytorch${{ matrix.pytorch }}-py${{ matrix.python }}-cuda-${{ matrix.cuda }}-${{ matrix.level }}-${{ env.UBUNTU_VERSION }}"
+          
+          if [[ $ver_tag == ${{ env.LATEST_CUDA }} ]]; then
+              TAGS="${img_path}:latest, ${img_path}:latest-cuda, ${img_path}:$ver_tag"
+          else
+              TAGS="${img_path}:$ver_tag"
+          fi
+          echo "TAGS=${TAGS}" >> ${GITHUB_ENV}
+      -
+        name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: build
+          build-args: |
+            IMAGE_BASE=ghcr.io/ai-dock/jupyter-pytorch:${{ matrix.pytorch }}-py${{ matrix.python }}-cuda-${{ matrix.cuda }}-${{ matrix.level }}-${{ env.UBUNTU_VERSION }}
+          push: true
+          provenance: false
+          tags: ${{ env.TAGS }}
+
   amd-base:
     runs-on: ubuntu-latest
     strategy:
