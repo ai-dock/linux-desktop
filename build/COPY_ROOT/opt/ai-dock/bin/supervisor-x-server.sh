@@ -14,6 +14,10 @@ function cleanup() {
 
 function start() {
     source /opt/ai-dock/etc/environment.sh
+
+    # Hardcode VIDEO_PORT: Users are breaking host machines!!
+    export VIDEO_PORT=DFP
+    env-store VIDEO_PORT
     
     if [[ ${SERVERLESS,,} = "true" ]]; then
         printf "Refusing to start $SERVICE_NAME in serverless mode\n"
@@ -28,8 +32,7 @@ function start() {
     done
     
     cleanup
-    # This symbolic link enables running Xorg inside a container with `-sharevts`
-    sudo ln -snf /dev/ptmx /dev/tty7
+
     sudo mkdir -pm700 /tmp/runtime-user
     sudo chown $(id -u):$(id -u) /tmp/runtime-user
     
@@ -40,7 +43,7 @@ function start() {
         start_nvidia
     else
         printf "Starting proxy X server...\n"
-        export X_PROXY=true
+        export X_PROXY=forced
         env-store X_PROXY
         start_proxy
     fi
@@ -49,6 +52,9 @@ function start() {
 function start_nvidia() {
     # Mostly copied from https://github.com/selkies-project/docker-nvidia-glx-desktop
     
+    # This symbolic link enables running Xorg inside a container with `-sharevts`
+    sudo ln -snf /dev/ptmx /dev/tty7
+
     # Check if nvidia display drivers are present - Download if not
     if ! which nvidia-xconfig /dev/null 2>&1; then
         # Driver version is provided by the kernel through the container toolkit

@@ -38,7 +38,8 @@ ENV SIZEH 1080
 ENV REFRESH 60
 ENV DPI 96
 ENV CDEPTH 24
-ENV VIDEO_PORT DFP
+# Hardcoded in x-server init. Users are breaking host machines. Do not use the on vast/runpod!!
+#ENV VIDEO_PORT DFP
 
 ENV WEBRTC_ENCODER nvh264enc
 ENV WEBRTC_ENABLE_RESIZE false
