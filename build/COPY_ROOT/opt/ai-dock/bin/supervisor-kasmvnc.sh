@@ -38,12 +38,22 @@ function start() {
     fuser -k -SIGKILL ${LISTEN_PORT}/tcp > /dev/null 2>&1 &
     wait -n
     
-    printf "Starting ${SERVICE_NAME}...\n"
+    /usr/bin/python3 /opt/ai-dock/fastapi/logviewer/main.py \
+        -p $LISTEN_PORT \
+        -r 5 \
+        -s "${SERVICE_NAME}" \
+        -t "Preparing ${SERVICE_NAME}" &
+    fastapi_pid=$!
     
-    until [ -S "/tmp/.X11-unix/X${DISPLAY/:/}" ]; do
-        printf "Waiting for X11 socket...\n"
+    while [[ -f /run/workspace_sync || -f /run/container_config || ! -S /run/dbus/system_bus_socket || ! -S "/tmp/.X11-unix/X${DISPLAY/:/}" ]]; do
+        printf "Waiting for X11 and container provisioning...\n"
         sleep 1
     done
+
+    kill $fastapi_pid &
+    wait -n
+
+    printf "Starting ${SERVICE_NAME}...\n"
     source /opt/ai-dock/etc/environment.sh
     sudo cp -f /usr/share/kasmvnc/kasmvnc_defaults.yaml.template \
         /usr/share/kasmvnc/kasmvnc_defaults.yaml

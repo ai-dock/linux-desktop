@@ -27,27 +27,6 @@ apt-get install --install-recommends -y \
         libreoffice-plasma \
         libreoffice-style-breeze
 
-# Steam
-export GE_PROTON_VERSION="$(curl -fsSL "https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest" | jq -r '.tag_name')"
-env-store GE_PROTON_VERSION
-mkdir -p /opt/proton
-wget -c "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/${GE_PROTON_VERSION}/${GE_PROTON_VERSION}.tar.gz" -O - | tar xz -C /opt/proton
-proton_dir="/opt/proton/${GE_PROTON_VERSION}"
-cp /opt/ai-dock/share/proton/*.vdf "${proton_dir}"
-sed -i "s#PROTON_NAME#${GE_PROTON_VERSION}#g" "${proton_dir}/compatibilitytool.vdf"
-
-dpkg-divert --add /usr/games/steam
-$APT_INSTALL \
-    steam-installer \
-    libpipewire-0.3-0:i386 \
-    libxcb-res0:i386 \
-    libgtk2.0-0:i386
-cp -f /opt/ai-dock/share/steam/bin/steam /usr/games/steam
-chmod +x /usr/games/steam
-cp -f /opt/ai-dock/share/steam/bin/steam-native /usr/bin/steam-native
-chmod +x /usr/bin/steam-native
-ln -sf /usr/games/steam /usr/bin/steam
-
 # Graphics utils
 apt-get update
 $APT_INSTALL \

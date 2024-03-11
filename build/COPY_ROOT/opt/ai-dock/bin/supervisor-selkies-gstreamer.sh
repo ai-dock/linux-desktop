@@ -38,17 +38,23 @@ function start() {
     
     fuser -k -SIGKILL ${LISTEN_PORT}/tcp > /dev/null 2>&1 &
     wait -n
+
+    /usr/bin/python3 /opt/ai-dock/fastapi/logviewer/main.py \
+        -p $LISTEN_PORT \
+        -r 5 \
+        -s "${SERVICE_NAME}" \
+        -t "Preparing ${SERVICE_NAME}" &
+    fastapi_pid=$!
+    
+    while [[ -f /run/workspace_sync || -f /run/container_config || ! -S /run/dbus/system_bus_socket || ! -S "/tmp/.X11-unix/X${DISPLAY/:/}" ]]; do
+        printf "Waiting for X11 and container provisioning...\n"
+        sleep 1
+    done
+    
+    kill $fastapi_pid &
+    wait -n
+
     printf "Starting ${SERVICE_NAME}...\n"
-    
-    until [[ -S /run/dbus/system_bus_socket ]]; do
-        printf "Waiting for dbus socket...\n"
-        sleep 1
-    done
-    
-    until [ -S "/tmp/.X11-unix/X${DISPLAY/:/}" ]; do
-        printf "Waiting for X11 socket...\n"
-        sleep 1
-    done
     source /opt/ai-dock/etc/environment.sh
     
     sudo mkdir -pm755 /dev/input
@@ -73,10 +79,7 @@ function start() {
     # Start the selkies-gstreamer WebRTC HTML5 remote desktop application
    
     source /opt/gstreamer/gst-env
-    xmode="$(cat /tmp/.X-mode)"
-    if [[ $xmode == "proxy" ]]; then
-        selkies-gstreamer-resize ${SIZEW}x${SIZEH}
-    fi
+    selkies-gstreamer-resize ${SIZEW}x${SIZEH}
     
     if [[ ${ENABLE_COTURN,,} == "true" ]]; then
         export TURN_HOST="${TURN_HOST:-${EXTERNAL_IP_ADDRESS}}"
@@ -85,7 +88,7 @@ function start() {
         export TURN_PASSWORD="${COTURN_PASSWORD:-password}"
     fi
     
-    export LD_PRELOAD /usr/local/lib/selkies-js-interposer/joystick_interposer.so${LD_PRELOAD:+:${LD_PRELOAD}}
+    export LD_PRELOAD=/usr/local/lib/selkies-js-interposer/joystick_interposer.so${LD_PRELOAD:+:${LD_PRELOAD}}
     
     selkies-gstreamer \
         --enable_basic_auth=false \

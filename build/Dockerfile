@@ -1,5 +1,5 @@
 # For build automation - Allows building from any ai-dock base image
-ARG IMAGE_BASE="ghcr.io/ai-dock/base-image:cuda-11.8.0-base-22.04"
+ARG IMAGE_BASE="ghcr.io/ai-dock/base-image:cuda-11.8.0-runtime-22.04"
 FROM ${IMAGE_BASE}
 
 LABEL org.opencontainers.image.source https://github.com/ai-dock/linux-desktop
@@ -63,8 +63,6 @@ ENV APPIMAGE_EXTRACT_AND_RUN 1
 ARG WINE_BRANCH=staging
 ENV WINE_BRANCH=${WINE_BRANCH}
 
-ARG STEAM_ARCHIVE_ID=20240216110829
-ENV STEAM_ARCHIVE_ID=${STEAM_ARCHIVE_ID}
 # Copy early so we can use scripts in the build - Changes to these files will invalidate the cache and cause a rebuild.
 COPY --chown=0:1111 ./COPY_ROOT/ /
 
