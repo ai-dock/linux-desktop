@@ -330,8 +330,9 @@ See [this guide](https://link.ai-dock.org/guide-sshd-do) by DigitalOcean for an 
 >[!NOTE]  
 >_SSHD is included because the end-user should be able to know the version prior to deloyment. Using a providers add-on, if available, does not guarantee this._
 
->[!WARNING]  
->You should only provide auth tokens in secure cloud environments.
+### Syncthing
+
+[Syncthing](https://syncthing.net/) is a peer-to-peer continuous file synchronization program which is very useful for efficiently transporting your work files from a local workstation to a remote container instance.  As the files are sync'd in real-time there is no need for a separate download to retrieve the files.
 
 ### Logtail
 
@@ -355,6 +356,8 @@ Some ports need to be exposed for the services to run or for certain features of
 | `3478`                | Coturn turn server        |
 | `6100`                | Selkies WebRTC interface  |
 | `6200`                | KASMVNC Interface         |
+| `8384`                | Syncthing UI              |
+| `22999`               | Syncthing TCP Transport   |
 
 ## Pre-Configured Templates
 

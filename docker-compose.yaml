@@ -47,8 +47,9 @@ services:
         - ${WEBRTC_PORT_HOST:-6100}:${WEBRTC_PORT_HOST:-6100}
         # VNC
         - ${VNC_PORT_HOST:-6200}:${VNC_PORT_HOST:-6200}
-        # Rclone webserver for interactive configuration
-        - ${RCLONE_PORT_HOST:-53682}:${RCLONE_PORT_HOST:-53682}
+        # Syncthing
+        - ${SYNCTHING_UI_PORT_HOST:-8384}:${SYNCTHING_UI_PORT_HOST:-8384}
+        - ${SYNCTHING_TRANSPORT_PORT_HOST:-22999}:${SYNCTHING_TRANSPORT_PORT_HOST:-22999}
    
     environment:
         # Don't enclose values in quotes
@@ -85,8 +86,10 @@ services:
         - WEBRTC_PORT_HOST=${WEBRTC_PORT_HOST:-6100}
         - WEBRTC_METRICS_PORT=${WEBRTC_METRICS_PORT:-26100}
         - SERVERLESS=${SERVERLESS:-false}
-        #- PROVISIONING_SCRIPT=https://raw.githubusercontent.com/ai-dock/python/main/config/provisioning/default.sh
-    
+        - SYNCTHING_UI_PORT_HOST=${SYNCTHING_UI_PORT_HOST:-8384}
+        - SYNCTHING_TRANSPORT_PORT_HOST=${SYNCTHING_TRANSPORT_PORT_HOST:-22999}
+        #- PROVISIONING_SCRIPT=${PROVISIONING_SCRIPT:-}
+        
     # Magic bullet to solve networking issues - I don't like it
     # Turn server works fine both within local network and for internet
     #network_mode: "host"

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Name=Syncthing
+GenericName=File Synchronization
+Comment=File Synchronization
+Exec=xdg-open http://127.0.0.1:18384
+Icon=/opt/ai-dock/share/syncthing/syncthing.png
+Terminal=false
+Type=Application
+Categories=Network;System
