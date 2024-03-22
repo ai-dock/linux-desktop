@@ -2,10 +2,10 @@
 
 trap cleanup EXIT
 
-LISTEN_PORT=${SELKIES_PORT_LOCAL:-16100}
-METRICS_PORT=${SELKIES_METRICS_PORT:-26100}
-PROXY_PORT=${SELKIES_PORT_HOST:-6100}
-PROXY_SECURE=true
+LISTEN_PORT=${WEBRTC_PORT_LOCAL:-16100}
+METRICS_PORT=${WEBRTC_METRICS_PORT:-26100}
+PROXY_PORT=${WEBRTC_PORT_HOST:-6100}
+SERVICE_URL="${WEBRTC_URL:-}"
 QUICKTUNNELS=true
 SERVICE_NAME="KDE Plasma Desktop (WebRTC)"
 
@@ -31,6 +31,7 @@ function start() {
         --arg proxy_port "${PROXY_PORT}" \
         --arg proxy_secure "${PROXY_SECURE,,}" \
         --arg service_name "${SERVICE_NAME}" \
+        --arg service_url "${SERVICE_URL}" \
         '$ARGS.named'
     )"
     
@@ -94,7 +95,7 @@ function start() {
         --enable_basic_auth=false \
         --addr="127.0.0.1" \
         --port="${LISTEN_PORT}" \
-        --metrics_port=26105 $SELKIES_FLAGS
+        --metrics_port=26105 $WEBRTC_FLAGS
 }
 
 start 2>&1

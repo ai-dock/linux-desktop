@@ -5,7 +5,7 @@ trap cleanup EXIT
 LISTEN_PORT=${VNC_PORT_LOCAL:-16200}
 METRICS_PORT=${VNC_METRICS_PORT:-26200}
 PROXY_PORT=${VNC_PORT_HOST:-6200}
-PROXY_SECURE=true
+SERVICE_URL="${VNC_URL:-}"
 QUICKTUNNELS=true
 SERVICE_NAME="KDE Plasma Desktop (VNC Fallback)"
 
@@ -30,6 +30,7 @@ function start() {
         --arg proxy_port "${PROXY_PORT}" \
         --arg proxy_secure "${PROXY_SECURE,,}" \
         --arg service_name "${SERVICE_NAME}" \
+        --arg service_url "${SERVICE_URL}" \
         '$ARGS.named'
     )"
     
