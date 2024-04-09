@@ -156,6 +156,7 @@ jobs:
         pytorch:
           - "2.1.2"
           - "2.2.0"
+          - "2.2.1"
         exclude:
           - python: "3.12"
             pytorch: "2.1.2"
@@ -193,7 +194,7 @@ jobs:
         name: Set tags
         run: |
           img_path="ghcr.io/${{ env.PACKAGE_NAME }}"
-          ver_tag="jupyter-pytorch-${{ matrix.pytorch }}-py${{ matrix.python }}-cuda-${{ matrix.cuda }}-${{ matrix.level }}-${{ env.UBUNTU_VERSION }}"
+          ver_tag="pytorch-${{ matrix.pytorch }}-py${{ matrix.python }}-cuda-${{ matrix.cuda }}-${{ matrix.level }}-${{ env.UBUNTU_VERSION }}"
           
           if [[ $ver_tag == ${{ env.LATEST_CUDA }} ]]; then
               TAGS="${img_path}:latest, ${img_path}:latest-cuda, ${img_path}:$ver_tag"
