@@ -8,15 +8,15 @@ on:
 env:
   UBUNTU_VERSION: 22.04
   BUILDX_NO_DEFAULT_ATTESTATIONS: 1
-  LATEST_CUDA: "cuda-11.8.0-runtime-22.04"
-  LATEST_ROCM: "rocm-5.6-runtime-22.04"
-  LATEST_CPU: "cpu-22.04"
 
 jobs:
   cpu-base:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
+      matrix:
+        build:
+          - {latest: "false", selkies: "1.6.1"}
     steps:
       -
         name: Free Space
@@ -51,13 +51,14 @@ jobs:
         name: Set tags
         run: |
           img_path="ghcr.io/${{ env.PACKAGE_NAME }}"
-          ver_tag="cpu-${{ env.UBUNTU_VERSION }}"
+          ver_tag="v2-cpu-${{ env.UBUNTU_VERSION }}"
           
-          if [[ $ver_tag == ${{ env.LATEST_CPU }} ]]; then
-              TAGS="${img_path}:latest-cpu, ${img_path}:$ver_tag"
-          else
-              TAGS="${img_path}:$ver_tag"
-          fi
+          if [[ ${{ matrix.build.latest }} == "true" ]]; then
+                echo "Marking latest"
+                TAGS="${img_path}:${base_tag}, ${img_path}:latest-cpu"
+            else
+                TAGS="${img_path}:${base_tag}"
+            fi
           echo "TAGS=${TAGS}" >> ${GITHUB_ENV}
       -
         name: Build and push
@@ -65,7 +66,7 @@ jobs:
         with:
           context: build
           build-args: |
-            IMAGE_BASE=ghcr.io/ai-dock/base-image:cpu-${{ env.UBUNTU_VERSION }}
+            IMAGE_BASE=ghcr.io/ai-dock/base-image:v2-cpu-${{ env.UBUNTU_VERSION }}
           push: true
           # Avoids unknown/unknown architecture and extra metadata
           provenance: false
@@ -76,15 +77,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        cuda:
-          - 11.8.0
-          - 12.1.0
-          - 12.2.0
-          - 12.3.1
-        level:
-          - "base"
-          - "runtime"
-          - "devel"
+        build:
+          - {latest: "false", selkies: "1.6.1", cuda: "12.1.1-cudnn8-runtime"}
     steps:
       -
         name: Free Space
@@ -119,13 +113,14 @@ jobs:
         name: Set tags
         run: |
           img_path="ghcr.io/${{ env.PACKAGE_NAME }}"
-          ver_tag="cuda-${{ matrix.cuda }}-${{ matrix.level }}-${{ env.UBUNTU_VERSION }}"
+          ver_tag="v2-cuda-${{ matrix.build.cuda }}-${{ env.UBUNTU_VERSION }}"
           
-          if [[ $ver_tag == ${{ env.LATEST_CUDA }} ]]; then
-              TAGS="${img_path}:latest, ${img_path}:latest-cuda, ${img_path}:$ver_tag"
-          else
-              TAGS="${img_path}:$ver_tag"
-          fi
+          if [[ ${{ matrix.build.latest }} == "true" ]]; then
+                echo "Marking latest"
+                TAGS="${img_path}:${base_tag}, ${img_path}:latest, ${img_path}:latest-cuda"
+            else
+                TAGS="${img_path}:${base_tag}"
+            fi
           echo "TAGS=${TAGS}" >> ${GITHUB_ENV}
       -
         name: Build and push
@@ -133,82 +128,7 @@ jobs:
         with:
           context: build
           build-args: |
-            IMAGE_BASE=ghcr.io/ai-dock/base-image:cuda-${{ matrix.cuda }}-${{ matrix.level }}-${{ env.UBUNTU_VERSION }}
-          push: true
-          provenance: false
-          tags: ${{ env.TAGS }}
-
-  nvidia-base-pytorch:
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        cuda:
-          - 11.8.0
-          - 12.1.0
-        level:
-          - "runtime"
-          - "devel"
-        python:
-          - "3.10"
-          - "3.11"
-          - "3.12"
-        pytorch:
-          - "2.1.2"
-          - "2.2.0"
-          - "2.2.1"
-        exclude:
-          - python: "3.12"
-            pytorch: "2.1.2"
-    steps:
-      -
-        name: Free Space
-        run: |
-          df -h
-          rm -rf /usr/share/dotnet
-          rm -rf /opt/ghc
-          rm -rf /usr/local/share/boost
-          rm -rf "$AGENT_TOOLSDIRECTORY"
-          df -h
-      -
-        name: Env Setter
-        run: |
-          echo "PACKAGE_NAME=${GITHUB_REPOSITORY,,}" >> ${GITHUB_ENV}
-      -
-        name: Checkout
-        uses: actions/checkout@v3
-      -
-        name: Permissions fixes
-        run: |
-          reponame="$(basename ${GITHUB_REPOSITORY})"
-          target="${HOME}/work/${reponame}/${reponame}/build/COPY*"
-          chmod -R ug+rwX ${target}
-      -
-        name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      -
-        name: Set tags
-        run: |
-          img_path="ghcr.io/${{ env.PACKAGE_NAME }}"
-          ver_tag="pytorch-${{ matrix.pytorch }}-py${{ matrix.python }}-cuda-${{ matrix.cuda }}-${{ matrix.level }}-${{ env.UBUNTU_VERSION }}"
-          
-          if [[ $ver_tag == ${{ env.LATEST_CUDA }} ]]; then
-              TAGS="${img_path}:latest, ${img_path}:latest-cuda, ${img_path}:$ver_tag"
-          else
-              TAGS="${img_path}:$ver_tag"
-          fi
-          echo "TAGS=${TAGS}" >> ${GITHUB_ENV}
-      -
-        name: Build and push
-        uses: docker/build-push-action@v4
-        with:
-          context: build
-          build-args: |
-            IMAGE_BASE=ghcr.io/ai-dock/jupyter-pytorch:${{ matrix.pytorch }}-py${{ matrix.python }}-cuda-${{ matrix.cuda }}-${{ matrix.level }}-${{ env.UBUNTU_VERSION }}
+            IMAGE_BASE=ghcr.io/ai-dock/base-image:v2-cuda-${{ matrix.build.cuda }}-${{ env.UBUNTU_VERSION }}
           push: true
           provenance: false
           tags: ${{ env.TAGS }}
@@ -218,12 +138,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rocm:
-          - 5.7
-          - 5.6
-        level:
-          - "core"
-          - "runtime"
+        build:
+          - {latest: "false", selkies: "1.6.1", rocm: "6.0-runtime"}
     steps:
       -
         name: Free Space
@@ -258,13 +174,14 @@ jobs:
         name: Set tags
         run: |
           img_path="ghcr.io/${{ env.PACKAGE_NAME }}"
-          ver_tag="rocm-${{ matrix.rocm }}-${{ matrix.level }}-${{ env.UBUNTU_VERSION }}"
+          ver_tag="v2-rocm-${{ matrix.build.rocm }}-${{ env.UBUNTU_VERSION }}"
           
-          if [[ $ver_tag == ${{ env.LATEST_ROCM }} ]]; then
-              TAGS="${img_path}:latest-rocm, ${img_path}:$ver_tag"
-          else
-              TAGS="${img_path}:$ver_tag"
-          fi
+          if [[ ${{ matrix.build.latest }} == "true" ]]; then
+                echo "Marking latest"
+                TAGS="${img_path}:${base_tag}, ${img_path}:latest-rocm"
+            else
+                TAGS="${img_path}:${base_tag}"
+            fi
           echo "TAGS=${TAGS}" >> ${GITHUB_ENV}
       -
         name: Build and push
@@ -272,7 +189,7 @@ jobs:
         with:
           context: build
           build-args: |
-            IMAGE_BASE=ghcr.io/ai-dock/base-image:rocm-${{ matrix.rocm }}-${{ matrix.level }}-${{ env.UBUNTU_VERSION }}
+            IMAGE_BASE=ghcr.io/ai-dock/base-image:v2-rocm-${{ matrix.build.rocm }}-${{ env.UBUNTU_VERSION }}
           push: true
           provenance: false
           tags: ${{ env.TAGS }}

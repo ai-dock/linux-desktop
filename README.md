@@ -7,7 +7,7 @@ Run a hardware accelerated KDE desktop in a container. This image is heavily inf
 
 ## Documentation
 
-All AI-Dock containers share a common base which is designed to make running on cloud services such as [vast.ai](https://link.ai-dock.org/vast.ai) and [runpod.io](https://link.ai-dock.org/template) as straightforward and user friendly as possible.
+All AI-Dock containers share a common base which is designed to make running on cloud services such as [vast.ai](https://link.ai-dock.org/vast.ai) as straightforward and user friendly as possible.
 
 Common features and options are documented in the [base wiki](https://github.com/ai-dock/base-image/wiki) but any additional features unique to this image will be detailed below.
 
@@ -48,11 +48,6 @@ Supported Platforms: `NVIDIA CUDA`, `AMD ROCm`, `CPU/iGPU`
 
 [linux-desktop:latest](https://link.ai-dock.org/template-vast-linux-desktop)
 
----
-
-**Runpod.​io**
-
-[linux-desktop:latest](https://link.ai-dock.org/template-runpod-linux-desktop)
 
 ---
 
