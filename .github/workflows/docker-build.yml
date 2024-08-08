@@ -99,6 +99,7 @@ jobs:
       matrix:
         build:
           - {latest: "true", selkies: "1.6.1", cuda: "12.1.1-cudnn8-runtime"}
+          - {latest: "false", selkies: "1.6.1", cuda: "12.1.1-cudnn8-devel"}
     steps:
       -
         name: Free Space
@@ -180,6 +181,7 @@ jobs:
       matrix:
         build:
           - {latest: "true", selkies: "1.6.1", rocm: "6.0-runtime"}
+          - {latest: "false", selkies: "1.6.1", rocm: "6.0-devel"}
     steps:
       -
         name: Free Space
