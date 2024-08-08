@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         build:
-          - {latest: "false", selkies: "1.6.1"}
+          - {latest: "true", selkies: "1.6.1"}
     steps:
       -
         name: Free Space
@@ -73,11 +73,11 @@ jobs:
           if [[ ${{ matrix.build.latest }} == "true" ]]; then
                 echo "Marking latest"
                 # GHCR.io Tags
-                TAGS="${img_path_ghcr}:${base_tag}, ${img_path_ghcr}:latest-cpu"
+                TAGS="${img_path_ghcr}:${base_tag}, ${base_tag}-v${SELKIES_VERSION}, ${img_path_ghcr}:latest-cpu"
                 # Docker.io Tags
                 TAGS="${TAGS}, ${img_path_dhub}:${SELKIES_VERSION}-ubuntu-${{ env.UBUNTU_VERSION }}, ${img_path_dhub}:latest"
             else
-                TAGS="${img_path_ghcr}:${base_tag}, ${img_path_dhub}:${SELKIES_VERSION}-ubuntu-${{ env.UBUNTU_VERSION }}"
+                TAGS="${img_path_ghcr}:${base_tag}-v${SELKIES_VERSION}, ${img_path_dhub}:v${SELKIES_VERSION}-ubuntu-${{ env.UBUNTU_VERSION }}"
             fi
           echo "TAGS=${TAGS}" >> ${GITHUB_ENV}
       -
@@ -98,7 +98,7 @@ jobs:
       fail-fast: false
       matrix:
         build:
-          - {latest: "false", selkies: "1.6.1", cuda: "12.1.1-cudnn8-runtime"}
+          - {latest: "true", selkies: "1.6.1", cuda: "12.1.1-cudnn8-runtime"}
     steps:
       -
         name: Free Space
@@ -155,11 +155,11 @@ jobs:
           if [[ ${{ matrix.build.latest }} == "true" ]]; then
                 echo "Marking latest"
                 # GHCR.io Tags
-                TAGS="${img_path_ghcr}:${base_tag}, ${img_path_ghcr}:${base_tag}-${SELKIES_VERSION}, ${img_path_ghcr}:latest, ${img_path_ghcr}:latest-cuda"
+                TAGS="${img_path_ghcr}:${base_tag}, ${img_path_ghcr}:${base_tag}-v${SELKIES_VERSION}, ${img_path_ghcr}:latest, ${img_path_ghcr}:latest-cuda"
                 # Docker.io Tags
-                TAGS="${TAGS}, ${img_path_dhub}:${SELKIES_VERSION}-${{ matrix.build.cuda }}, ${img_path_dhub}:latest"
+                TAGS="${TAGS}, ${img_path_dhub}:v${SELKIES_VERSION}-${{ matrix.build.cuda }}, ${img_path_dhub}:latest"
             else
-                TAGS="${img_path_ghcr}:${base_tag}-${SELKIES_VERSION}, ${img_path_dhub}:${SELKIES_VERSION}-${{ matrix.build.cuda }}"
+                TAGS="${img_path_ghcr}:${base_tag}-v${SELKIES_VERSION}, ${img_path_dhub}:v${SELKIES_VERSION}-${{ matrix.build.cuda }}"
             fi
           echo "TAGS=${TAGS}" >> ${GITHUB_ENV}
       -
@@ -179,7 +179,7 @@ jobs:
       fail-fast: false
       matrix:
         build:
-          - {latest: "false", selkies: "1.6.1", rocm: "6.0-runtime"}
+          - {latest: "true", selkies: "1.6.1", rocm: "6.0-runtime"}
     steps:
       -
         name: Free Space
@@ -236,11 +236,11 @@ jobs:
           if [[ ${{ matrix.build.latest }} == "true" ]]; then
                 echo "Marking latest"
                 # GHCR.io Tags
-                TAGS="${img_path_ghcr}:${base_tag}, ${img_path_ghcr}:${base_tag}-${SELKIES_VERSION}, ${img_path_ghcr}:latest-rocm"
+                TAGS="${img_path_ghcr}:${base_tag}, ${img_path_ghcr}:${base_tag}-v${SELKIES_VERSION}, ${img_path_ghcr}:latest-rocm"
                 # Docker.io Tags
-                TAGS="${TAGS}, ${img_path_dhub}:${SELKIES_VERSION}-${{ matrix.build.rocm }}, ${img_path_dhub}:latest"
+                TAGS="${TAGS}, ${img_path_dhub}:v${SELKIES_VERSION}-${{ matrix.build.rocm }}, ${img_path_dhub}:latest"
             else
-                TAGS="${img_path_ghcr}:${base_tag}-${SELKIES_VERSION}, ${img_path_dhub}:${SELKIES_VERSION}-${{ matrix.build.rocm }}"
+                TAGS="${img_path_ghcr}:${base_tag}-v${SELKIES_VERSION}, ${img_path_dhub}:v${SELKIES_VERSION}-${{ matrix.build.rocm }}"
             fi
           echo "TAGS=${TAGS}" >> ${GITHUB_ENV}
       -
