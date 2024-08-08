@@ -5,11 +5,12 @@ services:
     build:
       context: ./build
       args:
-        IMAGE_BASE: ${IMAGE_BASE:-ghcr.io/ai-dock/base-image:cuda-11.8.0-runtime-22.04}
+        IMAGE_BASE: ${IMAGE_BASE:-ghcr.io/ai-dock/base-image:v2-cuda-12.1.1-cuddn8-runtime-22.04}
+        SELKIES_VERSION: ${SELKIES_VERSION:-latest}
       tags:
-        - "ghcr.io/ai-dock/linux-desktop:${IMAGE_TAG:-cuda-11.8.0-runtime-22.04}"
+        - "ghcr.io/ai-dock/linux-desktop:${IMAGE_TAG:-v2-cuda-12.1.1-cudnn8-runtime-22.04}"
         
-    image: ghcr.io/ai-dock/linux-desktop:${IMAGE_TAG:-cuda-11.8.0-base-22.04}
+    image: ghcr.io/ai-dock/linux-desktop:${IMAGE_TAG:-v2-cuda-12.1.1-cudnn8-runtime-22.04}
     
     shm_size: 2G
     
@@ -44,7 +45,7 @@ services:
         # Coturn
         - ${COTURN_PORT_HOST:-3478}:${COTURN_PORT_HOST:-3478}
         # Selkies
-        - ${WEBRTC_PORT_HOST:-6100}:${WEBRTC_PORT_HOST:-6100}
+        - ${SELKIES_PORT_HOST:-6100}:${SELKIES_PORT_HOST:-6100}
         # VNC
         - ${VNC_PORT_HOST:-6200}:${VNC_PORT_HOST:-6200}
         # Syncthing
@@ -61,14 +62,16 @@ services:
         # Auto-generated when empty
         - COTURN_PASSWORD=${COTURN_PASSWORD:-}
         # External IP if coturn
-        - TURN_HOST=${TURN_HOST:-127.0.0.1}
-        - TURN_PORT=${TURN_PORT:-3478}
-        - TURN_PROTOCOL=${TURN_PROTOCOL:-tcp}
-        - TURN_USERNAME=${TURN_USERNAME:-}
-        - TURN_PASSWORD=${TURN_PASSWORD:-}
-        - WEBRTC_ENABLE_RESIZE=${WEBRTC_ENABLE_RESIZE:-false}
-        - WEBRTC_ENCODER=${WEBRTC_ENCODER:-nvh264enc}
-        - WEBRTC_FLAGS=${WEBRTC_FLAGS:-}
+        - SELKIES_TURN_HOST=${SELKIES_TURN_HOST:-127.0.0.1}
+        - SELKIES_TURN_PORT=${SELKIES_TURN_PORT:-3478}
+        - SELKIES_TURN_PROTOCOL=${SELKIES_TURN_PROTOCOL:-tcp}
+        - SELKIES_TURN_USERNAME=${SELKIES_TURN_USERNAME:-}
+        - SELKIES_TURN_PASSWORD=${SELKIES_TURN_PASSWORD:-}
+        - SELKIES_ENABLE_RESIZE=${SELKIES_ENABLE_RESIZE:-false}
+        - SELKIES_ENCODER=${SELKIES_ENCODER:-nvh264enc}
+        - SELKIES_ARGS=${SELKIES_ARGS:-}
+        - PIPEWIRE_LATENCY=${PIPEWIRE_LATENCY:-32/48000}
+        - PULSE_LATENCY_MSEC=${PULSE_LATENCY_MSEC:-60}
         - DIRECT_ADDRESS=${DIRECT_ADDRESS:-127.0.0.1}
         - DIRECT_ADDRESS_GET_WAN=${DIRECT_ADDRESS_GET_WAN:-false}
         - WORKSPACE=${WORKSPACE:-/workspace}
@@ -86,9 +89,9 @@ services:
         - VNC_PORT_HOST=${VNC_PORT_HOST:-6200}
         - VNC_METRICS_PORT=${VNC_METRICS_PORT:-26200}
         - VNC_URL=${VNC_URL:-}
-        - WEBRTC_PORT_HOST=${WEBRTC_PORT_HOST:-6100}
-        - WEBRTC_METRICS_PORT=${WEBRTC_METRICS_PORT:-26100}
-        - WEBRTC_URL=${WEBRTC_URL:-}
+        - SELKIES_PORT_HOST=${SELKIES_PORT_HOST:-6100}
+        - SELKIES_METRICS_PORT=${SELKIES_METRICS_PORT:-26100}
+        - SELKIES_URL=${SELKIES_URL:-}
         - SERVERLESS=${SERVERLESS:-false}
         - SYNCTHING_UI_PORT_HOST=${SYNCTHING_UI_PORT_HOST:-8384}
         - SYNCTHING_TRANSPORT_PORT_HOST=${SYNCTHING_TRANSPORT_PORT_HOST:-22999}
