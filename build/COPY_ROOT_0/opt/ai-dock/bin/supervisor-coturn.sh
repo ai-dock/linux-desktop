@@ -4,7 +4,7 @@ trap cleanup EXIT
 
 SERVICE_NAME="Coturn"
 LISTEN_PORT="${COTURN_PORT_HOST:-3478}"
-COTURN_LISTEN_ADDRESS=${COTURN_LISTEN_ADDRESS:-${EXTERNAL_IP_ADDRESS}}
+COTURN_LISTEN_ADDRESS=${COTURN_LISTEN_ADDRESS:-$(/opt/ai-dock/bin/external-ip-address)}
 
 function cleanup() {
     fuser -k -SIGTERM ${LISTEN_PORT}/tcp > /dev/null 2>&1 &

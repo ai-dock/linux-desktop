@@ -181,7 +181,6 @@ jobs:
       matrix:
         build:
           - {latest: "false", selkies: "1.6.2", rocm: "6.0-runtime"}
-          - {latest: "false", selkies: "1.6.2", rocm: "6.0-devel"}
     steps:
       -
         name: Free Space
