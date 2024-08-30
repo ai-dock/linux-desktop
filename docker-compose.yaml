@@ -23,6 +23,12 @@ services:
     #          count: all
     #          capabilities: [gpu]
     
+    cap_add:
+      - SYS_ADMIN
+
+    security_opt:
+      - seccomp:unconfined
+
     devices:
       - "/dev/dri:/dev/dri"
       # For AMD GPU
@@ -97,6 +103,14 @@ services:
         - SYNCTHING_TRANSPORT_PORT_HOST=${SYNCTHING_TRANSPORT_PORT_HOST:-22999}
         - SYNCTHING_URL=${SYNCTHING_URL:-}
         #- PROVISIONING_SCRIPT=${PROVISIONING_SCRIPT:-}
+        # Vast.ai KVM testing
+        - VAST_TCP_PORT_1111=${VAST_TCP_PORT_1111}
+        - VAST_TCP_PORT_2222=${VAST_TCP_PORT_2222}
+        - VAST_TCP_PORT_6100=${VAST_TCP_PORT_6100}
+        - VAST_TCP_PORT_6200=${VAST_TCP_PORT_6200}
+        - VAST_TCP_PORT_8384=${VAST_TCP_PORT_8384}
+        - VAST_TCP_PORT_70000=${VAST_TCP_PORT_70000}
+        - VAST_TCP_PORT_72299=${VAST_TCP_PORT_72299}
         
     # Magic bullet to solve networking issues - I don't like it
     # Turn server works fine both within local network and for internet
